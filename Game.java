@@ -1,17 +1,34 @@
+import java.awt.*;
+import java.awt.image.*;
+import java.awt.event.*;
+import java.io.*;
 import java.util.*;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 public class Game {
     //these variables need to be used in several methods and
     //it is a hassle to pass them every time
-    public static Deck gameDeck;
-    public static Scanner userInput = new Scanner(System.in);
-    public static Player dealer;
-    public static ArrayList<Player> playerArray;
-    public static Card showing;
+    public  Deck gameDeck;
+    public  Scanner userInput = new Scanner(System.in);
+    public  Player dealer;
+    public  ArrayList<Player> playerArray;
+    public  Card showing;
+    public  JFrame frame;
+    public  JPanel menu;
+    public JTextField textbox;
+    public String userinput;
+    public JLabel instructions;
+    public boolean gameIsGoing;
     //main is a simple loop system meant to just handle the highest level
-    public static void main(String[] args) 
+    public static void main(String[] args)
+    {
+        Game game = new Game();
+        game.main();
+    }
+
+    public void main() 
     {
         startGame();
-        boolean gameIsGoing = true;
         while (gameIsGoing == true) {
             dealAll();
             for (Player player: playerArray) {
@@ -31,12 +48,9 @@ public class Game {
                 userInput.close();
             }
         }
-        //this is just because bluej wouldnt stop running the program even tho 
-        //it was over
-        System.exit(0);
     }
     //this reshuffles the deck and clears all hands
-    public static void resetGame()
+    public void resetGame()
     {
         for(Player player : playerArray)
         {
@@ -48,7 +62,7 @@ public class Game {
     }
     //compares all scores to the dealer, accounts that the player loses
     //if both they and the dealer bust
-    public static void scoreCompare()
+    public void scoreCompare()
     {
         for(Player player : playerArray)
         {
@@ -81,7 +95,7 @@ public class Game {
     }
     //the dealers turn
     // accounts for hit on soft 17
-    public static void dealerTurn()
+    public void dealerTurn()
     {
         if(dealer.returnHandValue() == 21)
         {
@@ -113,7 +127,7 @@ public class Game {
         }
     }
     //does the full turn of hitting and staying for a single player
-    public static void playerTurn(Player player)
+    public void playerTurn(Player player)
     {
         if(player.returnHandValue() == 21)
         {
@@ -145,7 +159,7 @@ public class Game {
     //order
     //this doesnt use a loop so we can save the second card dealt to the
     //dealer thats the one he is showing
-    public static void dealAll() 
+    public void dealAll() 
     {
         for (Player player: playerArray) {
             player.takeCard(gameDeck.drawCard());
@@ -161,40 +175,26 @@ public class Game {
     //initializes all static variables, creates the player array
     //creates the dealer, and shuffles the deck
     //only called once, resetgame is used to play multiple rounds
-    public static void startGame() 
+    public void startGame() 
     {
+        frame = new JFrame();
+        frame.setSize(900,900);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        instructions = new JLabel();
+        menu = new JPanel();
+        menu.add(instructions);
+        frame.add(menu);
+        textbox = new JTextField("Enter how many players in the game: ");
+        textbox.addActionListener(new TextListener());
+        menu.add(textbox);
+        frame.setVisible(true);
         gameDeck = new Deck();
         dealer = new Player();
-        System.out.println("Enter how many players in the game: ");
-        int playerCount = -1;
-        if(userInput.hasNextInt() == true)
-        {
-            playerCount = userInput.nextInt();
-        }
-        else
-        {
-            userInput.next();
-        }
-        while(playerCount <= 0) 
-        {
-            System.out.println("Please enter a positive integer");
-            if(userInput.hasNextInt() == false)
-            {
-                userInput.next(); 
-                continue;
-            }
-            playerCount = userInput.nextInt();
-        }
-        playerArray = new ArrayList<Player>();
-        for (int i = 0; i < playerCount; i++) 
-        {
-            playerArray.add(new Player());
-        }
-        gameDeck.shuffle();
+
     }
     //asks to hit or stay, if player types hit returns true
     //if player types stay returns false
-    public static boolean userMove(Player player) 
+    public boolean userMove(Player player) 
     {
         System.out.println("Your cards are:");
         for(Card card : player.hand)
@@ -214,6 +214,94 @@ public class Game {
         }
         else {
             return false;
+        }
+    }
+     class HitListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent event) 
+        {
+        }
+    }
+     class StayListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent event) 
+        {
+        }
+    }
+     class DoubleListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent event) 
+        {
+        }
+    }
+     class SplitListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent event) 
+        {
+        }
+    }
+    class TextListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent event) 
+        {
+
+            userinput = textbox.getText();
+            int playerCount = -1;
+            userinput.trim();
+            //input validation is a lot harder with textfields so dont enter non numbers
+            playerCount = Integer.parseInt(userinput);
+            while(playerCount <= 0 || playerCount >= 4) 
+            {
+                instructions.setText("Please enter a positive integer 3 or below");
+
+                playerCount = Integer.parseInt(userinput);
+            }
+            playerArray = new ArrayList<Player>();
+            for (int i = 0; i < playerCount; i++) 
+            {
+                playerArray.add(new Player());
+            }
+            frame.remove(menu);
+            frame.setLayout(new GridLayout(3,3));
+            JPanel blank = new JPanel();
+            JButton hit = new JButton("Hit!");
+            hit.addActionListener(new HitListener());
+            JButton stay = new JButton("Stay!");
+            hit.addActionListener(new StayListener());
+            JButton split = new JButton("Split!");
+            hit.addActionListener(new SplitListener());
+            JButton doubler = new JButton("Double!");
+            hit.addActionListener(new DoubleListener());
+            hit.setSize(300,300);
+            frame.add(hit);
+            frame.add(dealer.panel);
+            frame.add(stay);
+            if(playerArray.get(0) != null)
+            {
+                frame.add(playerArray.get(0).panel);
+            }
+            else{frame.add(blank);}
+            frame.add(menu);
+            if(playerArray.get(1) != null)
+            {
+                frame.add(playerArray.get(1).panel);
+            }
+            else{frame.add(blank);}
+            frame.add(doubler);
+            if(playerArray.get(2) != null)
+            {
+                frame.add(playerArray.get(2).panel);
+            }
+            else{frame.add(blank);}
+            frame.add(split);
+            gameDeck.shuffle();
+            frame.setVisible(true);
+            gameIsGoing = true;
         }
     }
 }

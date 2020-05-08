@@ -1,3 +1,4 @@
+import java.awt.*;
 public class Card{
     public final int rank;
     public final int suit;
@@ -34,31 +35,31 @@ public class Card{
     // as a rank
     public static String rankToString(int rank) {
         if (rank == ACE) {
-            return "Ace";
+            return "A";
         } else if (rank == DEUCE) {
-            return "Deuce";
+            return "2";
         } else if (rank == THREE) {
-            return "Three";
+            return "3";
         } else if (rank == FOUR) {
-            return "Four";
+            return "4";
         } else if (rank == FIVE) {
-            return "Five";
+            return "5";
         } else if (rank == SIX) {
-            return "Six";
+            return "6";
         } else if (rank == SEVEN) {
-            return "Seven";
+            return "7";
         } else if (rank == EIGHT) {
-            return "Eight";
+            return "8";
         } else if (rank == NINE) {
-            return "Nine";
+            return "9";
         } else if (rank == TEN) {
-            return "Ten";
+            return "10";
         } else if (rank == JACK) {
-            return "Jack";
+            return "J";
         } else if (rank == QUEEN) {
-            return "Queen";
+            return "Q";
         } else if (rank == KING) {
-            return "King";
+            return "K";
         } else {
             //Handle an illegal argument.  There are generally two
             //ways to handle invalid arguments, throwing an exception
@@ -109,16 +110,16 @@ public class Card{
 
     public static String suitToString(int inputSuit) {
         if (inputSuit == 1) {
-            return "Diamonds";
+            return "D";
         }
         else if (inputSuit == 2) {
-            return "Clubs";
+            return "C";
         }
         else if (inputSuit == 3) {
-            return "Hearts";
+            return "H";
         }
         else if (inputSuit == 4) {
-            return "Spades";
+            return "S";
         }
         else {
             return null;
