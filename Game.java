@@ -15,10 +15,13 @@ public class Game {
     public  Card showing;
     public  JFrame frame;
     public  JPanel menu;
-    public JTextField textbox;
     public String userinput;
     public JLabel instructions;
     public boolean gameIsGoing;
+    boolean playerturn;
+    Player currentPlayer;
+    //couldnt get split to work with my images and whatnot...
+
     //main is a simple loop system meant to just handle the highest level
     public static void main(String[] args)
     {
@@ -36,7 +39,7 @@ public class Game {
             }
             dealerTurn();
             scoreCompare();
-            System.out.println("Do you want to keep playing?");
+            instructions.setText("Do you want to keep playing?");
             String check = userInput.nextLine();
             if(check.equals("yes"))
             {
@@ -45,7 +48,6 @@ public class Game {
             else
             {
                 gameIsGoing =false;
-                userInput.close();
             }
         }
     }
@@ -68,28 +70,38 @@ public class Game {
         {
             if (player.returnHandValue()>21)
             {
-                System.out.println("You busted this round, " + player.name);
-                System.out.println("Better luck next time!");
+                instructions.setText("You busted this round, " + player.name);
+                try{Thread.sleep(5000);}
+                catch(InterruptedException exc){}
+                instructions.setText("Better luck next time!");
             }
             else if(dealer.returnHandValue() > 21)
             {
-                System.out.println("Congratulations "+player.name+"!");
-                System.out.println("You won this round!");
+                instructions.setText("Congratulations "+player.name+"!");
+                try{Thread.sleep(5000);}
+                catch(InterruptedException exc){}
+                instructions.setText("You won this round!");
             }
             else if (player.returnHandValue() > dealer.returnHandValue())
             {
-                System.out.println("Congratulations "+player.name+"!");
-                System.out.println("You won this round!");
+                instructions.setText("Congratulations "+player.name+"!");
+                try{Thread.sleep(5000);}
+                catch(InterruptedException exc){}
+                instructions.setText("You won this round!");
             }
             else if (player.returnHandValue() < dealer.returnHandValue())
             {
-                System.out.println("I'm sorry " +player.name+ ".");
-                System.out.println("Better luck next time!");
+                instructions.setText("I'm sorry " +player.name+ ".");
+                try{Thread.sleep(5000);}
+                catch(InterruptedException exc){}
+                instructions.setText("Better luck next time!");
             }
             else if (player.returnHandValue() == dealer.returnHandValue())
             {
-                System.out.println("That's a push for "+ player.name);
-                System.out.println("At least you didn't lose!");            
+                instructions.setText("That's a push for "+ player.name);
+                try{Thread.sleep(5000);}
+                catch(InterruptedException exc){}
+                instructions.setText("At least you didn't lose!");            
             }
         }
     }
@@ -105,25 +117,26 @@ public class Game {
         {
             if (dealer.returnHandValue() != 17 || dealer.soft == true)
             {
-                System.out.println("The Dealer's cards are:");
-                for(Card card : dealer.hand)
+                //System.out.println("The Dealer's cards are:");
+                /*for(Card card : dealer.hand)
                 {
                     System.out.println(card.rankToString());
                 }
                 System.out.println("For a total of " + dealer.returnHandValue());
+                */
                 Card temp = gameDeck.drawCard();
                 dealer.takeCard(temp);
-                System.out.println("The dealer hit and got a " + temp.rankToString());
+                //System.out.println("The dealer hit and got a " + temp.rankToString());
             }
 
         }
         if(dealer.returnHandValue() > 21)
         {
-            System.out.println("Dealer busts");
+            instructions.setText("Dealer busts");
         }
         else
         {
-            System.out.println("Dealer ends with a "+ dealer.returnHandValue());
+            instructions.setText("Dealer ends with a "+ dealer.returnHandValue());
         }
     }
     //does the full turn of hitting and staying for a single player
@@ -131,23 +144,12 @@ public class Game {
     {
         if(player.returnHandValue() == 21)
         {
-            System.out.println("Blackjack!");
+            instructions.setText("Blackjack!");
         }
-        while(player.returnHandValue() <= 21)
+        else{playerturn = true;}
+        while(player.returnHandValue() <= 21 && playerturn == true)
         {
-            System.out.println("What do you want to do, "+ player.name);
-            boolean hit = userMove(player);
-            if(hit == true)
-            {
-                Card temp = gameDeck.drawCard();
-                player.takeCard(temp);
-                System.out.println("You hit and got a " + temp.rankToString());
-            }
-            else
-            {
-                System.out.println("Good choice to stay on a "+player.returnHandValue());
-                break;
-            }
+            currentPlayer = player;
         }
         if (player.returnHandValue() > 21)
         {
@@ -183,90 +185,25 @@ public class Game {
         instructions = new JLabel();
         menu = new JPanel();
         menu.add(instructions);
-        frame.add(menu);
-        textbox = new JTextField("Enter how many players in the game: ");
-        textbox.addActionListener(new TextListener());
-        menu.add(textbox);
         frame.setVisible(true);
         gameDeck = new Deck();
         dealer = new Player();
-
-    }
-    //asks to hit or stay, if player types hit returns true
-    //if player types stay returns false
-    public boolean userMove(Player player) 
-    {
-        System.out.println("Your cards are:");
-        for(Card card : player.hand)
-        {
-            System.out.println(card.rankToString());
-        }
-        System.out.println("For a total of " + player.returnHandValue());
-        System.out.println("The dealer is showing a "+showing.rankToString());
-        System.out.println("Would you like to hit or stay?");
-        String playerInput = userInput.nextLine();
-        while (!(playerInput.equals("hit") || playerInput.equals("stay"))) {
-            System.out.println("Please enter either 'hit' to draw a card or 'stay' to hold");
-            playerInput= userInput.nextLine();
-        }
-        if (playerInput.equals("hit")) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-     class HitListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent event) 
-        {
-        }
-    }
-     class StayListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent event) 
-        {
-        }
-    }
-     class DoubleListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent event) 
-        {
-        }
-    }
-     class SplitListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent event) 
-        {
-        }
-    }
-    class TextListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent event) 
-        {
-
-            userinput = textbox.getText();
-            int playerCount = -1;
-            userinput.trim();
             //input validation is a lot harder with textfields so dont enter non numbers
-            playerCount = Integer.parseInt(userinput);
+            /*playerCount = Integer.parseInt(userinput);
             while(playerCount <= 0 || playerCount >= 4) 
             {
                 instructions.setText("Please enter a positive integer 3 or below");
 
                 playerCount = Integer.parseInt(userinput);
             }
+            */
+          int playerCount =3;
             playerArray = new ArrayList<Player>();
             for (int i = 0; i < playerCount; i++) 
             {
                 playerArray.add(new Player());
             }
-            frame.remove(menu);
+
             frame.setLayout(new GridLayout(3,3));
             JPanel blank = new JPanel();
             JButton hit = new JButton("Hit!");
@@ -281,27 +218,98 @@ public class Game {
             frame.add(hit);
             frame.add(dealer.panel);
             frame.add(stay);
-            if(playerArray.get(0) != null)
+            try{if(playerArray.get(0) != null)
             {
                 frame.add(playerArray.get(0).panel);
             }
+            
             else{frame.add(blank);}
+        }
+        catch(ArrayIndexOutOfBoundsException exc){frame.add(blank);}
             frame.add(menu);
-            if(playerArray.get(1) != null)
+            
+            try{if(playerArray.get(1) != null)
             {
                 frame.add(playerArray.get(1).panel);
             }
+            
             else{frame.add(blank);}
+        }
+        catch(ArrayIndexOutOfBoundsException exc){frame.add(blank);}
             frame.add(doubler);
-            if(playerArray.get(2) != null)
+            try{if(playerArray.get(2) != null)
             {
                 frame.add(playerArray.get(2).panel);
             }
+            
             else{frame.add(blank);}
+        }
+        catch(ArrayIndexOutOfBoundsException exc){frame.add(blank);}
+        
+        
             frame.add(split);
             gameDeck.shuffle();
             frame.setVisible(true);
             gameIsGoing = true;
+    }
+    //asks to hit or stay, if player types hit returns true
+    //if player types stay returns false
+    public void userMove(Player player) 
+    {
+        instructions.setText("make your move...");
+        
+        //System.out.println("For a total of " + player.returnHandValue());
+        //System.out.println("The dealer is showing a "+showing.rankToString());
+        //System.out.println("Would you like to hit or stay?");
+        //String playerInput = userInput.nextLine();
+        /*while (!(playerInput.equals("hit") || playerInput.equals("stay"))) {
+            System.out.println("Please enter either 'hit' to draw a card or 'stay' to hold");
+            playerInput= userInput.nextLine();
+        }
+        if (playerInput.equals("hit")) {
+            return true;
+        }
+        else {
+            return false;
+        }*/
+    }
+     class HitListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent event) 
+        {
+            if(playerturn = true)
+            {
+                currentPlayer.takeCard(gameDeck.drawCard());
+            }
         }
     }
+     class StayListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent event) 
+        {
+            if(playerturn = true){playerturn = false;}
+        }
+    }
+     class DoubleListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent event) 
+        {
+            if(playerturn = true && currentPlayer.hand.size() < 3)
+            {
+                currentPlayer.takeCard(gameDeck.drawCard());
+                playerturn = false;
+            }
+        }
+    }
+     class SplitListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent event) 
+        {
+        }
+    }
+    
 }
